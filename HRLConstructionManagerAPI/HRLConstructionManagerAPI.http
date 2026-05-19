@@ -1,0 +1,292 @@
+@HRLConstructionManagerAPI_HostAddress = https://localhost:7219
+@JwtToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbW9iaWxlcGhvbmUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluIFVzZXIiLCJyb2xlSWQiOiIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJleHAiOjE3NzkyMTczMTAsImlzcyI6IkhSTENvbnN0cnVjdGlvbk1hbmFnZXJBUEkiLCJhdWQiOiJIUkxDb25zdHJ1Y3Rpb25NYW5hZ2VyQVBJIn0.f_DrQKFdxMnInwdHn0Yi0m39e4yDWh-y3KLVICg-5f0
+
+### =========================================
+
+### REST API - Login
+
+### =========================================
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+"mobileNumber": "9999999999",
+"password": "admin"
+}
+
+### =========================================
+
+### PUBLIC GRAPHQL
+
+### =========================================
+
+### Public GraphQL - Health Check
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql/public
+Content-Type: application/json
+
+{
+"query": "query { healthCheck }"
+}
+
+###
+
+### Public GraphQL - Login
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql/public
+Content-Type: application/json
+
+{
+"query": "mutation Login($input: LoginInput!) { login(input: $input) { token expiresOn user { id mobileNumber name roleId address email createdOn createdBy modifiedOn modifiedBy } } }",
+"variables": {
+"input": {
+"mobileNumber": "9999999999",
+"password": "admin"
+}
+}
+}
+
+### =========================================
+
+### PRIVATE GRAPHQL - ROLES
+
+### =========================================
+
+### GraphQL - Get All Roles
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetRoles { roles { id roleName enable createdOn } }"
+}
+
+###
+
+### GraphQL - Get Role By Id
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetRole($id: Int!) { role(id: $id) { id roleName enable createdOn modifiedOn } }",
+"variables": {
+"id": 1
+}
+}
+
+###
+
+### GraphQL - Create Role
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation CreateRole($input: CreateRoleInput!) { createRole(input: $input) { id roleName enable createdOn modifiedOn } }",
+"variables": {
+"input": {
+"roleName": "manager",
+"enable": true
+}
+}
+}
+
+###
+
+### GraphQL - Update Role
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation UpdateRole($input: UpdateRoleInput!) { updateRole(input: $input) { id roleName enable createdOn modifiedOn } }",
+"variables": {
+"input": {
+"id": 1,
+"roleName": "admin",
+"enable": true
+}
+}
+}
+
+### =========================================
+
+### PRIVATE GRAPHQL - USERS
+
+### =========================================
+
+### GraphQL - Get All Users
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetUsers { users { id mobileNumber name roleId address email createdOn createdBy modifiedOn modifiedBy } }"
+}
+
+###
+
+### GraphQL - Get User By Id
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetUser($id: Int!) { user(id: $id) { id mobileNumber name roleId address email createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"id": 1
+}
+}
+
+###
+
+### GraphQL - Create User
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation CreateUser($input: CreateUserInput!) { createUser(input: $input) { id mobileNumber name roleId address email createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"mobileNumber": "7777777777",
+"name": "Manager User",
+"password": "manager",
+"roleId": 1,
+"address": "Project Office",
+"email": "[manager@example.com](mailto:manager@example.com)",
+"createdBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Update User
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation UpdateUser($input: UpdateUserInput!) { updateUser(input: $input) { id mobileNumber name roleId address email createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"id": 1,
+"mobileNumber": "9999999999",
+"name": "Admin User",
+"roleId": 1,
+"address": "Head Office",
+"email": "[admin@example.com](mailto:admin@example.com)",
+"modifiedBy": "system"
+}
+}
+}
+
+### =========================================
+
+### PRIVATE GRAPHQL - SITES
+
+### =========================================
+
+### GraphQL - Get All Sites
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetSites { sites { id siteName address city state contactPerson contactNumber startDate endDate enable createdOn createdBy modifiedOn modifiedBy } }"
+}
+
+###
+
+### GraphQL - Get Site By Id
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetSite($id: Int!) { site(id: $id) { id siteName address city state contactPerson contactNumber startDate endDate enable createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"id": 1
+}
+}
+
+###
+
+### GraphQL - Create Site
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation CreateSite($input: CreateSiteInput!) { createSite(input: $input) { id siteName address city state contactPerson contactNumber startDate endDate enable createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"siteName": "HRL Tower Site",
+"address": "Plot 12, Industrial Road",
+"city": "Ahmedabad",
+"state": "Gujarat",
+"contactPerson": "Site Supervisor",
+"contactNumber": "9876543210",
+"startDate": "2026-05-17T00:00:00Z",
+"endDate": null,
+"enable": true,
+"createdBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Update Site
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation UpdateSite($input: UpdateSiteInput!) { updateSite(input: $input) { id siteName address city state contactPerson contactNumber startDate endDate enable createdOn createdBy modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"id": 1,
+"siteName": "HRL Tower Site",
+"address": "Plot 12, Industrial Road",
+"city": "Ahmedabad",
+"state": "Gujarat",
+"contactPerson": "Site Supervisor",
+"contactNumber": "9876543210",
+"startDate": "2026-05-17T00:00:00Z",
+"endDate": null,
+"enable": true,
+"modifiedBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Delete Site
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation DeleteSite($id: Int!) { deleteSite(id: $id) }",
+"variables": {
+"id": 1
+}
+}
