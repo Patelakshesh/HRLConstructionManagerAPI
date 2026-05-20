@@ -1,19 +1,8 @@
 @HRLConstructionManagerAPI_HostAddress = https://localhost:7219
-@JwtToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbW9iaWxlcGhvbmUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluIFVzZXIiLCJyb2xlSWQiOiIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJleHAiOjE3NzkyMTczMTAsImlzcyI6IkhSTENvbnN0cnVjdGlvbk1hbmFnZXJBUEkiLCJhdWQiOiJIUkxDb25zdHJ1Y3Rpb25NYW5hZ2VyQVBJIn0.f_DrQKFdxMnInwdHn0Yi0m39e4yDWh-y3KLVICg-5f0
+@JwtToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidW5pcXVlX25hbWUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiIxIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbW9iaWxlcGhvbmUiOiI5OTk5OTk5OTk5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6IkFkbWluIFVzZXIiLCJyb2xlSWQiOiIxIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiYWRtaW4iLCJleHAiOjE3NzkyMjAyODMsImlzcyI6IkhSTENvbnN0cnVjdGlvbk1hbmFnZXJBUEkiLCJhdWQiOiJIUkxDb25zdHJ1Y3Rpb25NYW5hZ2VyQVBJIn0.fcdejKWFaX9NJ5vgPcDe1jwkDfbwqITXrR80Qrbq9L8
 
 ### =========================================
 
-### REST API - Login
-
-### =========================================
-
-POST {{HRLConstructionManagerAPI_HostAddress}}/auth/login
-Content-Type: application/json
-
-{
-"mobileNumber": "9999999999",
-"password": "admin"
-}
 
 ### =========================================
 

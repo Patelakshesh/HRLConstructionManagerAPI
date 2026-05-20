@@ -28,6 +28,18 @@ var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSetting
     ?? throw new InvalidOperationException("JwtSettings configuration is missing.");
 var jwtSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services
     .AddAuthentication(options =>
     {
@@ -131,6 +143,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
