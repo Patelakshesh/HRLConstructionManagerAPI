@@ -7,4 +7,6 @@ public sealed record UpdateUserInput(
     int RoleId,
     string Address,
     string? Email,
+    string? Password,
+    bool Enable,
     string? ModifiedBy);

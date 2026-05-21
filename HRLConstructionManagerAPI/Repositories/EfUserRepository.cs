@@ -12,6 +12,32 @@ public sealed class EfUserRepository(AppDbContext dbContext) : IUserRepository
             .OrderBy(user => user.Id)
             .ToArray();
 
+    public (IReadOnlyCollection<User> Items, int TotalCount) GetPaged(
+        int pageNumber,
+        int pageSize,
+        string? search)
+    {
+        var query = dbContext.Users.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(user =>
+                user.Name.Contains(term) ||
+                user.MobileNumber.Contains(term) ||
+                (user.Email != null && user.Email.Contains(term)));
+        }
+
+        var totalCount = query.Count();
+        var items = query
+            .OrderBy(user => user.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToArray();
+
+        return (items, totalCount);
+    }
+
     public User? GetById(int id) =>
         dbContext.Users
             .AsNoTracking()
@@ -44,6 +70,11 @@ public sealed class EfUserRepository(AppDbContext dbContext) : IUserRepository
         existingUser.RoleId = user.RoleId;
         existingUser.Address = user.Address;
         existingUser.Email = user.Email;
+        if (!string.IsNullOrWhiteSpace(user.Password))
+        {
+            existingUser.Password = user.Password;
+        }
+        existingUser.Enable = user.Enable;
         existingUser.ModifiedOn = DateTime.UtcNow;
         existingUser.ModifiedBy = user.ModifiedBy;
 

@@ -7,4 +7,5 @@ public sealed record CreateUserInput(
     int RoleId,
     string Address,
     string? Email,
-    string? CreatedBy);
+    bool Enable = true,
+    string? CreatedBy = null);

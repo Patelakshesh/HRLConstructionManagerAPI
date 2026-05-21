@@ -21,6 +21,14 @@ public sealed class UserManagementQuery
         userService.GetUsers();
 
     [Authorize]
+    public UserPage GetUsersPage(
+        int pageNumber,
+        int pageSize,
+        string? search,
+        [Service] IUserService userService) =>
+        userService.GetUsersPage(pageNumber, pageSize, search);
+
+    [Authorize]
     public UserDto? GetUser(int id, [Service] IUserService userService) =>
         userService.GetUser(id);
 }

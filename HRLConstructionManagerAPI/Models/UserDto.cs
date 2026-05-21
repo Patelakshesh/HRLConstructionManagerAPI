@@ -7,6 +7,7 @@ public sealed record UserDto(
     int RoleId,
     string Address,
     string? Email,
+    bool Enable,
     DateTime CreatedOn,
     string? CreatedBy,
     DateTime? ModifiedOn,

@@ -1,3 +1,6 @@
+using System.Net.Mail;
+using System;
+using System.Text.RegularExpressions;
 using HRLConstructionManagerAPI.Entities;
 using HRLConstructionManagerAPI.Models;
 using HRLConstructionManagerAPI.Repositories;
@@ -6,7 +9,35 @@ namespace HRLConstructionManagerAPI.Services;
 
 public sealed class UserService(IUserRepository userRepository, IRoleRepository roleRepository) : IUserService
 {
+    private const int DefaultPageSize = 10;
+    private const int MaxPageSize = 100;
+
     public IReadOnlyCollection<UserDto> GetUsers() => userRepository.GetAll().Select(ToDto).ToArray();
+
+    public UserPage GetUsersPage(int pageNumber, int pageSize, string? search)
+    {
+        var normalizedPageNumber = pageNumber < 1 ? 1 : pageNumber;
+        var normalizedPageSize = pageSize < 1
+            ? DefaultPageSize
+            : Math.Min(pageSize, MaxPageSize);
+        var normalizedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
+
+        var (items, totalCount) = userRepository.GetPaged(
+            normalizedPageNumber,
+            normalizedPageSize,
+            normalizedSearch);
+
+        var totalPages = normalizedPageSize == 0
+            ? 0
+            : (int)Math.Ceiling(totalCount / (double)normalizedPageSize);
+
+        return new UserPage(
+            items.Select(ToDto).ToArray(),
+            totalCount,
+            normalizedPageNumber,
+            normalizedPageSize,
+            totalPages);
+    }
 
     public UserDto? GetUser(int id)
     {
@@ -17,16 +48,26 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto CreateUser(CreateUserInput input)
     {
+        ValidateCreateInput(input);
         EnsureRoleExists(input.RoleId);
+
+        var mobileNumber = input.MobileNumber.Trim();
+        var name = input.Name.Trim();
+        var address = input.Address.Trim();
+        var email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim();
+        var password = string.IsNullOrWhiteSpace(input.Password) ? null : input.Password.Trim();
+
+        EnsureMobileNumberUnique(mobileNumber);
 
         var user = new User
         {
-            MobileNumber = input.MobileNumber,
-            Name = input.Name,
-            Password = input.Password,
+            MobileNumber = mobileNumber,
+            Name = name,
+            Password = password ?? input.Password,
             RoleId = input.RoleId,
-            Address = input.Address,
-            Email = input.Email,
+            Address = address,
+            Email = email,
+            Enable = input.Enable,
             CreatedBy = input.CreatedBy
         };
 
@@ -35,16 +76,28 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto? UpdateUser(UpdateUserInput input)
     {
+        ValidateUpdateInput(input);
         EnsureRoleExists(input.RoleId);
+        EnsureUserExists(input.Id);
+
+        var mobileNumber = input.MobileNumber.Trim();
+        var name = input.Name.Trim();
+        var address = input.Address.Trim();
+        var email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim();
+        var password = string.IsNullOrWhiteSpace(input.Password) ? null : input.Password.Trim();
+
+        EnsureMobileNumberUnique(mobileNumber, input.Id);
 
         var user = new User
         {
             Id = input.Id,
-            MobileNumber = input.MobileNumber,
-            Name = input.Name,
+            MobileNumber = mobileNumber,
+            Name = name,
             RoleId = input.RoleId,
-            Address = input.Address,
-            Email = input.Email,
+            Address = address,
+            Email = email,
+            Password = password ?? string.Empty,
+            Enable = input.Enable,
             ModifiedBy = input.ModifiedBy
         };
 
@@ -61,6 +114,121 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
         }
     }
 
+    private void EnsureUserExists(int userId)
+    {
+        if (userRepository.GetById(userId) is null)
+        {
+            throw new GraphQLException($"User with id '{userId}' was not found.");
+        }
+    }
+
+    private void EnsureMobileNumberUnique(string mobileNumber, int? userId = null)
+    {
+        var normalizedMobile = mobileNumber.Trim();
+        var existingUser = userRepository.GetByMobileNumber(normalizedMobile);
+        if (existingUser is not null && existingUser.Id != userId)
+        {
+            throw new GraphQLException("Mobile number is already in use.");
+        }
+    }
+
+    private static void ValidateCreateInput(CreateUserInput input)
+    {
+        if (string.IsNullOrWhiteSpace(input.Name))
+        {
+            throw new GraphQLException("Name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.MobileNumber))
+        {
+            throw new GraphQLException("Mobile number is required.");
+        }
+
+        if (!IsValidMobileNumber(input.MobileNumber))
+        {
+            throw new GraphQLException("Mobile number must be a 10-digit number.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.Password))
+        {
+            throw new GraphQLException("Password is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.Address))
+        {
+            throw new GraphQLException("Address is required.");
+        }
+
+        if (input.RoleId <= 0)
+        {
+            throw new GraphQLException("Role is required.");
+        }
+
+        if (input.Password is not null && string.IsNullOrWhiteSpace(input.Password))
+        {
+            throw new GraphQLException("Password cannot be blank.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(input.Email) && !IsValidEmail(input.Email))
+        {
+            throw new GraphQLException("Email address is invalid.");
+        }
+    }
+
+    private static void ValidateUpdateInput(UpdateUserInput input)
+    {
+        if (input.Id <= 0)
+        {
+            throw new GraphQLException("User id is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.Name))
+        {
+            throw new GraphQLException("Name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.MobileNumber))
+        {
+            throw new GraphQLException("Mobile number is required.");
+        }
+
+        if (!IsValidMobileNumber(input.MobileNumber))
+        {
+            throw new GraphQLException("Mobile number must be a 10-digit number.");
+        }
+
+        if (string.IsNullOrWhiteSpace(input.Address))
+        {
+            throw new GraphQLException("Address is required.");
+        }
+
+        if (input.RoleId <= 0)
+        {
+            throw new GraphQLException("Role is required.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(input.Email) && !IsValidEmail(input.Email))
+        {
+            throw new GraphQLException("Email address is invalid.");
+        }
+    }
+
+    private static bool IsValidMobileNumber(string mobileNumber) =>
+        Regex.IsMatch(mobileNumber.Trim(), "^\\d{10}$");
+
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var address = new MailAddress(email);
+            return address.Address.Equals(email, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static UserDto ToDto(User user) =>
         new(
             user.Id,
@@ -69,6 +237,7 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
             user.RoleId,
             user.Address,
             user.Email,
+            user.Enable,
             user.CreatedOn,
             user.CreatedBy,
             user.ModifiedOn,

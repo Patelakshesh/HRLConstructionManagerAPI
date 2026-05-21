@@ -14,6 +14,8 @@ public class User
 
     public Role? Role { get; set; }
 
+    public bool Enable { get; set; } = true;
+
     public required string Address { get; set; }
 
     public string? Email { get; set; }

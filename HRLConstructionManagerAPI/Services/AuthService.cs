@@ -21,6 +21,11 @@ public sealed class AuthService(IUserRepository userRepository, IOptions<JwtSett
             throw new UnauthorizedAccessException("Invalid mobile number or password.");
         }
 
+        if (!user.Enable)
+        {
+            throw new UnauthorizedAccessException("User is inactive.");
+        }
+
         var expiresOn = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
         var token = GenerateToken(user, expiresOn);
 
@@ -64,6 +69,7 @@ public sealed class AuthService(IUserRepository userRepository, IOptions<JwtSett
             user.RoleId,
             user.Address,
             user.Email,
+            user.Enable,
             user.CreatedOn,
             user.CreatedBy,
             user.ModifiedOn,

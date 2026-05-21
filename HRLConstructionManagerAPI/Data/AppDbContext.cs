@@ -73,6 +73,9 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 .HasMaxLength(500)
                 .IsRequired();
 
+            entity.Property(user => user.Enable)
+                .IsRequired();
+
             entity.Property(user => user.Email)
                 .HasMaxLength(256);
 
@@ -103,6 +106,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                     RoleId = 1,
                     Address = "Head Office",
                     Email = "admin@example.com",
+                    Enable = true,
                     CreatedOn = SeedCreatedOn,
                     CreatedBy = "system"
                 },
@@ -115,6 +119,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                     RoleId = 2,
                     Address = "Site Office",
                     Email = "supervision@example.com",
+                    Enable = true,
                     CreatedOn = SeedCreatedOn,
                     CreatedBy = "system"
                 });
