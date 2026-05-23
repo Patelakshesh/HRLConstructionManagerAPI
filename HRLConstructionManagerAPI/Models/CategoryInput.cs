@@ -1,14 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HRLConstructionManagerAPI.Models;
 
 public sealed record CreateCategoryInput(
-    string Name,
-    string? Description,
+    [Required] [MaxLength(100)] string Name,
+    [Required] [MaxLength(500)] string? Description,
     bool Enable,
     string? CreatedBy);
 
 public sealed record UpdateCategoryInput(
-    int Id,
-    string Name,
-    string? Description,
+    [Required] int Id,
+    [Required] [MaxLength(100)] string Name,
+    [Required] [MaxLength(500)] string? Description,
     bool Enable,
     string? ModifiedBy);

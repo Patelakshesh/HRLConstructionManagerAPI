@@ -1,6 +1,3 @@
-using System.Net.Mail;
-using System;
-using System.Text.RegularExpressions;
 using HRLConstructionManagerAPI.Entities;
 using HRLConstructionManagerAPI.Models;
 using HRLConstructionManagerAPI.Repositories;
@@ -49,24 +46,11 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
     public UserDto CreateUser(CreateUserInput input)
     {
         var mobileNumber = input.MobileNumber.Trim();
-        var name = input.Name.Trim();
-        var address = input.Address.Trim();
-        var email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim();
-        var password = string.IsNullOrWhiteSpace(input.Password) ? null : input.Password.Trim();
-
         EnsureMobileNumberUnique(mobileNumber);
 
-        var user = new User
-        {
-            MobileNumber = mobileNumber,
-            Name = name,
-            Password = password ?? input.Password,
-            RoleId = input.RoleId,
-            Address = address,
-            Email = email,
-            Enable = input.Enable,
-            CreatedBy = input.CreatedBy
-        };
+        var user = BuildUser(mobileNumber, input.Name, input.RoleId, input.Address, input.Email, input.Enable);
+        user.Password = input.Password?.Trim() ?? string.Empty;
+        user.CreatedBy = input.CreatedBy;
 
         return ToDto(userRepository.Add(user));
     }
@@ -76,38 +60,30 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
         EnsureUserExists(input.Id);
 
         var mobileNumber = input.MobileNumber.Trim();
-        var name = input.Name.Trim();
-        var address = input.Address.Trim();
-        var email = string.IsNullOrWhiteSpace(input.Email) ? null : input.Email.Trim();
-        var password = string.IsNullOrWhiteSpace(input.Password) ? null : input.Password.Trim();
-
         EnsureMobileNumberUnique(mobileNumber, input.Id);
 
-        var user = new User
-        {
-            Id = input.Id,
-            MobileNumber = mobileNumber,
-            Name = name,
-            RoleId = input.RoleId,
-            Address = address,
-            Email = email,
-            Password = password ?? string.Empty,
-            Enable = input.Enable,
-            ModifiedBy = input.ModifiedBy
-        };
+        var user = BuildUser(mobileNumber, input.Name, input.RoleId, input.Address, input.Email, input.Enable);
+        user.Id = input.Id;
+        user.Password = input.Password?.Trim() ?? string.Empty;
+        user.ModifiedBy = input.ModifiedBy;
 
         var updatedUser = userRepository.Update(user);
-
         return updatedUser is null ? null : ToDto(updatedUser);
     }
 
-    private void EnsureRoleExists(int roleId)
-    {
-        if (roleRepository.GetById(roleId) is null)
+    private static User BuildUser(
+        string mobileNumber, string name, int roleId,
+        string address, string? email, bool enable) =>
+        new()
         {
-            throw new GraphQLException($"Role with id '{roleId}' was not found.");
-        }
-    }
+            MobileNumber = mobileNumber,
+            Name = name.Trim(),
+            RoleId = roleId,
+            Address = address.Trim(),
+            Email = string.IsNullOrWhiteSpace(email) ? null : email.Trim(),
+            Enable = enable
+        };
+
 
     private void EnsureUserExists(int userId)
     {
@@ -135,6 +111,7 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
             user.RoleId,
             user.Address,
             user.Email,
+            user.Password,
             user.Enable,
             user.CreatedOn,
             user.CreatedBy,

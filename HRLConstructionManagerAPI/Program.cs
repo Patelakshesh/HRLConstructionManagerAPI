@@ -26,7 +26,6 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
     ?? throw new InvalidOperationException("JwtSettings configuration is missing.");
-var jwtSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
 
 builder.Services.AddCors(options =>
 {
@@ -72,14 +71,10 @@ builder.Services
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine("AUTH FAILED");
-                Console.WriteLine(context.Exception.ToString());
-                return Task.CompletedTask;
-            },
-
-            OnTokenValidated = context =>
-            {
-                Console.WriteLine("TOKEN VALIDATED");
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtBearer");
+                logger.LogWarning(context.Exception, "JWT authentication failed.");
                 return Task.CompletedTask;
             }
         };

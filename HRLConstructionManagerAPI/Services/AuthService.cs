@@ -69,6 +69,7 @@ public sealed class AuthService(IUserRepository userRepository, IOptions<JwtSett
             user.RoleId,
             user.Address,
             user.Email,
+            user.Password,
             user.Enable,
             user.CreatedOn,
             user.CreatedBy,

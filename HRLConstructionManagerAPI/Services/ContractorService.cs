@@ -1,5 +1,3 @@
-using System.Net.Mail;
-using System.Text.RegularExpressions;
 using HRLConstructionManagerAPI.Entities;
 using HRLConstructionManagerAPI.Models;
 using HRLConstructionManagerAPI.Repositories;
@@ -42,80 +40,36 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
 
     public Contractor CreateContractor(CreateContractorInput input)
     {
-        ValidateInput(input.CompanyName, input.ContactPerson, input.Email, input.Phone);
-
-        var contractor = new Contractor
-        {
-            CompanyName = input.CompanyName.Trim(),
-            ContactPerson = input.ContactPerson.Trim(),
-            Email = input.Email.Trim(),
-            Phone = input.Phone.Trim(),
-            AssignedSites = input.AssignedSites?.Trim(),
-            Enable = input.Enable,
-            CreatedBy = input.CreatedBy
-        };
+        var contractor = BuildContractor(input.CompanyName, input.ContactPerson, input.Email, input.Phone, input.AssignedSites, input.Enable);
+        contractor.CreatedBy = input.CreatedBy;
 
         return contractorRepository.Add(contractor);
     }
 
     public Contractor? UpdateContractor(UpdateContractorInput input)
     {
-        ValidateInput(input.CompanyName, input.ContactPerson, input.Email, input.Phone);
-
-        var contractor = new Contractor
-        {
-            Id = input.Id,
-            CompanyName = input.CompanyName.Trim(),
-            ContactPerson = input.ContactPerson.Trim(),
-            Email = input.Email.Trim(),
-            Phone = input.Phone.Trim(),
-            AssignedSites = input.AssignedSites?.Trim(),
-            Enable = input.Enable,
-            ModifiedBy = input.ModifiedBy
-        };
+        var contractor = BuildContractor(input.CompanyName, input.ContactPerson, input.Email, input.Phone, input.AssignedSites, input.Enable);
+        contractor.Id = input.Id;
+        contractor.ModifiedBy = input.ModifiedBy;
 
         return contractorRepository.Update(contractor);
     }
 
+    private static Contractor BuildContractor(
+        string companyName, string contactPerson, string email,
+        string phone, string? assignedSites, bool enable) =>
+        new()
+        {
+            CompanyName = companyName.Trim(),
+            ContactPerson = contactPerson.Trim(),
+            Email = email.Trim(),
+            Phone = phone.Trim(),
+            AssignedSites = assignedSites?.Trim(),
+            Enable = enable
+        };
+
     public bool DeleteContractor(int id) => contractorRepository.Delete(id);
 
-    private static void ValidateInput(string companyName, string contactPerson, string email, string phone)
-    {
-        if (string.IsNullOrWhiteSpace(companyName))
-        {
-            throw new ArgumentException("Company name is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(contactPerson))
-        {
-            throw new ArgumentException("Contact person is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new ArgumentException("Email is required.");
-        }
-        else
-        {
-            try
-            {
-                var mailAddress = new MailAddress(email);
-            }
-            catch (FormatException)
-            {
-                throw new ArgumentException("Invalid email format.");
-            }
-        }
-
-        if (string.IsNullOrWhiteSpace(phone))
-        {
-            throw new ArgumentException("Phone number is required.");
-        }
-        else if (!PhoneRegex().IsMatch(phone))
-        {
-            throw new ArgumentException("Phone number must be exactly 10 digits.");
-        }
-    }
 
     private static ContractorDto ToDto(Contractor contractor) =>
         new(
@@ -130,7 +84,4 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
             contractor.CreatedBy,
             contractor.ModifiedOn,
             contractor.ModifiedBy);
-
-    [GeneratedRegex(@"^\d{10}$")]
-    private static partial Regex PhoneRegex();
 }

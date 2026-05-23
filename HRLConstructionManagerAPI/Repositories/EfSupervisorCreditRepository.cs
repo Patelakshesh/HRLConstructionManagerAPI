@@ -24,10 +24,9 @@ public sealed class EfSupervisorCreditRepository(AppDbContext dbContext) : ISupe
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var searchLower = search.ToLower();
-            query = query.Where(c => 
-                c.Id.ToString().Contains(searchLower) || 
-                (c.Comment != null && c.Comment.ToLower().Contains(searchLower)));
+            query = query.Where(c =>
+                (c.Comment != null && c.Comment.Contains(search)) ||
+                c.SupervisorName.Contains(search));
         }
 
         if (!string.IsNullOrWhiteSpace(supervisorName) && supervisorName != "all")

@@ -40,112 +40,54 @@ public sealed class SiteService(ISiteRepository siteRepository) : ISiteService
 
     public Site CreateSite(CreateSiteInput input)
     {
-        ValidateCreateInput(input);
+        ValidateDates(input.StartDate, input.EndDate);
 
-        var site = new Site
-        {
-            SiteName = input.SiteName.Trim(),
-            Address = input.Address.Trim(),
-            City = string.IsNullOrWhiteSpace(input.City) ? null : input.City.Trim(),
-            State = string.IsNullOrWhiteSpace(input.State) ? null : input.State.Trim(),
-            ContactPerson = string.IsNullOrWhiteSpace(input.ContactPerson) ? null : input.ContactPerson.Trim(),
-            ContactNumber = string.IsNullOrWhiteSpace(input.ContactNumber) ? null : input.ContactNumber.Trim(),
-            StartDate = input.StartDate,
-            EndDate = input.EndDate,
-            Enable = input.Enable,
-            CreatedBy = input.CreatedBy
-        };
+        var site = BuildSite(input.SiteName, input.Address, input.City, input.State,
+            input.ContactPerson, input.ContactNumber, input.StartDate, input.EndDate, input.Enable);
+        site.CreatedBy = input.CreatedBy;
 
         return siteRepository.Add(site);
     }
 
     public Site? UpdateSite(UpdateSiteInput input)
     {
-        ValidateUpdateInput(input);
+        ValidateDates(input.StartDate, input.EndDate);
 
-        var site = new Site
-        {
-            Id = input.Id,
-            SiteName = input.SiteName.Trim(),
-            Address = input.Address.Trim(),
-            City = string.IsNullOrWhiteSpace(input.City) ? null : input.City.Trim(),
-            State = string.IsNullOrWhiteSpace(input.State) ? null : input.State.Trim(),
-            ContactPerson = string.IsNullOrWhiteSpace(input.ContactPerson) ? null : input.ContactPerson.Trim(),
-            ContactNumber = string.IsNullOrWhiteSpace(input.ContactNumber) ? null : input.ContactNumber.Trim(),
-            StartDate = input.StartDate,
-            EndDate = input.EndDate,
-            Enable = input.Enable,
-            ModifiedBy = input.ModifiedBy
-        };
+        var site = BuildSite(input.SiteName, input.Address, input.City, input.State,
+            input.ContactPerson, input.ContactNumber, input.StartDate, input.EndDate, input.Enable);
+        site.Id = input.Id;
+        site.ModifiedBy = input.ModifiedBy;
 
         return siteRepository.Update(site);
     }
 
+    private static Site BuildSite(
+        string siteName, string address, string? city, string? state,
+        string? contactPerson, string? contactNumber,
+        DateTime? startDate, DateTime? endDate, bool enable) =>
+        new()
+        {
+            SiteName = siteName.Trim(),
+            Address = address.Trim(),
+            City = string.IsNullOrWhiteSpace(city) ? null : city.Trim(),
+            State = string.IsNullOrWhiteSpace(state) ? null : state.Trim(),
+            ContactPerson = string.IsNullOrWhiteSpace(contactPerson) ? null : contactPerson.Trim(),
+            ContactNumber = string.IsNullOrWhiteSpace(contactNumber) ? null : contactNumber.Trim(),
+            StartDate = startDate,
+            EndDate = endDate,
+            Enable = enable
+        };
+
     public bool DeleteSite(int id) => siteRepository.Delete(id);
 
-    private static void ValidateCreateInput(CreateSiteInput input)
+    private static void ValidateDates(DateTime? startDate, DateTime? endDate)
     {
-        if (string.IsNullOrWhiteSpace(input.SiteName))
-        {
-            throw new GraphQLException("Site name is required.");
-        }
-
-        if (input.SiteName.Trim().Length > 200)
-        {
-            throw new GraphQLException("Site name must not exceed 200 characters.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Address))
-        {
-            throw new GraphQLException("Address is required.");
-        }
-
-        if (!string.IsNullOrWhiteSpace(input.ContactNumber) && !IsValidContactNumber(input.ContactNumber))
-        {
-            throw new GraphQLException("Contact number must be a valid 10-digit number.");
-        }
-
-        if (input.StartDate.HasValue && input.EndDate.HasValue && input.EndDate < input.StartDate)
+        if (startDate.HasValue && endDate.HasValue && endDate < startDate)
         {
             throw new GraphQLException("End date cannot be before the start date.");
         }
     }
 
-    private static void ValidateUpdateInput(UpdateSiteInput input)
-    {
-        if (input.Id <= 0)
-        {
-            throw new GraphQLException("Site id is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.SiteName))
-        {
-            throw new GraphQLException("Site name is required.");
-        }
-
-        if (input.SiteName.Trim().Length > 200)
-        {
-            throw new GraphQLException("Site name must not exceed 200 characters.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Address))
-        {
-            throw new GraphQLException("Address is required.");
-        }
-
-        if (!string.IsNullOrWhiteSpace(input.ContactNumber) && !IsValidContactNumber(input.ContactNumber))
-        {
-            throw new GraphQLException("Contact number must be a valid 10-digit number.");
-        }
-
-        if (input.StartDate.HasValue && input.EndDate.HasValue && input.EndDate < input.StartDate)
-        {
-            throw new GraphQLException("End date cannot be before the start date.");
-        }
-    }
-
-    private static bool IsValidContactNumber(string number) =>
-        System.Text.RegularExpressions.Regex.IsMatch(number.Trim(), @"^\d{10}$");
 
     private static SiteDto ToDto(Site site) =>
         new(

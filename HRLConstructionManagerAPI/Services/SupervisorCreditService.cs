@@ -50,57 +50,45 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
 
     public SupervisorCredit CreateSupervisorCredit(CreateSupervisorCreditInput input)
     {
-        ValidateInput(input.SupervisorName, input.Amount, input.PaymentMode, input.TransactionId);
+        var paymentMode = input.PaymentMode.Trim();
+        ValidatePaymentMode(paymentMode, input.TransactionId);
 
-        var credit = new SupervisorCredit
-        {
-            SupervisorName = input.SupervisorName.Trim(),
-            Amount = input.Amount,
-            PaymentMode = input.PaymentMode.Trim(),
-            TransactionId = string.IsNullOrWhiteSpace(input.TransactionId) ? null : input.TransactionId.Trim(),
-            Comment = string.IsNullOrWhiteSpace(input.Comment) ? null : input.Comment.Trim(),
-            Date = input.Date,
-            CreatedBy = input.CreatedBy
-        };
+        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date);
+        credit.CreatedBy = input.CreatedBy;
 
         return creditRepository.Add(credit);
     }
 
     public SupervisorCredit? UpdateSupervisorCredit(UpdateSupervisorCreditInput input)
     {
-        ValidateInput(input.SupervisorName, input.Amount, input.PaymentMode, input.TransactionId);
+        var paymentMode = input.PaymentMode.Trim();
+        ValidatePaymentMode(paymentMode, input.TransactionId);
 
-        var credit = new SupervisorCredit
-        {
-            Id = input.Id,
-            SupervisorName = input.SupervisorName.Trim(),
-            Amount = input.Amount,
-            PaymentMode = input.PaymentMode.Trim(),
-            TransactionId = string.IsNullOrWhiteSpace(input.TransactionId) ? null : input.TransactionId.Trim(),
-            Comment = string.IsNullOrWhiteSpace(input.Comment) ? null : input.Comment.Trim(),
-            Date = input.Date,
-            ModifiedBy = input.ModifiedBy
-        };
+        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date);
+        credit.Id = input.Id;
+        credit.ModifiedBy = input.ModifiedBy;
 
         return creditRepository.Update(credit);
     }
 
+    private static SupervisorCredit BuildCredit(
+        string supervisorName, decimal amount, string paymentMode,
+        string? transactionId, string? comment, DateTime date) =>
+        new()
+        {
+            SupervisorName = supervisorName.Trim(),
+            Amount = amount,
+            PaymentMode = paymentMode,
+            TransactionId = string.IsNullOrWhiteSpace(transactionId) ? null : transactionId.Trim(),
+            Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
+            Date = date
+        };
+
     public bool DeleteSupervisorCredit(int id) => creditRepository.Delete(id);
 
-    private static void ValidateInput(string supervisorName, decimal amount, string paymentMode, string? transactionId)
+    private static void ValidatePaymentMode(string paymentMode, string? transactionId)
     {
-        if (string.IsNullOrWhiteSpace(supervisorName))
-        {
-            throw new ArgumentException("Supervisor name is required.");
-        }
-
-        if (amount <= 0)
-        {
-            throw new ArgumentException("Amount must be greater than zero.");
-        }
-
-        if (string.IsNullOrWhiteSpace(paymentMode) || 
-            (paymentMode != "Cash" && paymentMode != "Check" && paymentMode != "Online"))
+        if (paymentMode != "Cash" && paymentMode != "Check" && paymentMode != "Online")
         {
             throw new ArgumentException("Payment mode must be Cash, Check, or Online.");
         }
@@ -110,6 +98,7 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
             throw new ArgumentException($"Transaction ID is required when payment mode is {paymentMode}.");
         }
     }
+
 
     private static SupervisorCreditDto ToDto(SupervisorCredit credit) =>
         new(

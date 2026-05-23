@@ -1,20 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HRLConstructionManagerAPI.Models;
 
 public sealed record CreateSupervisorCreditInput(
-    string SupervisorName,
-    decimal Amount,
-    string PaymentMode,
-    string? TransactionId,
-    string? Comment,
-    DateTime Date,
+    [Required] [MaxLength(150)] string SupervisorName,
+    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")] decimal Amount,
+    [Required] [MaxLength(50)] string PaymentMode,
+    [MaxLength(100)] string? TransactionId,
+    [MaxLength(500)] string? Comment,
+    [Required] DateTime Date,
     string? CreatedBy);
 
 public sealed record UpdateSupervisorCreditInput(
-    int Id,
-    string SupervisorName,
-    decimal Amount,
-    string PaymentMode,
-    string? TransactionId,
-    string? Comment,
-    DateTime Date,
+    [Required] int Id,
+    [Required] [MaxLength(150)] string SupervisorName,
+    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")] decimal Amount,
+    [Required] [MaxLength(50)] string PaymentMode,
+    [MaxLength(100)] string? TransactionId,
+    [MaxLength(500)] string? Comment,
+    [Required] DateTime Date,
     string? ModifiedBy);

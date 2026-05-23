@@ -40,49 +40,30 @@ public sealed class CategoryService(ICategoryRepository categoryRepository) : IC
 
     public Category CreateCategory(CreateCategoryInput input)
     {
-        ValidateInput(input.Name, input.Description);
-
-        var category = new Category
-        {
-            Name = input.Name.Trim(),
-            Description = input.Description?.Trim(),
-            Enable = input.Enable,
-            CreatedBy = input.CreatedBy
-        };
+        var category = BuildCategory(input.Name, input.Description, input.Enable);
+        category.CreatedBy = input.CreatedBy;
 
         return categoryRepository.Add(category);
     }
 
     public Category? UpdateCategory(UpdateCategoryInput input)
     {
-        ValidateInput(input.Name, input.Description);
-
-        var category = new Category
-        {
-            Id = input.Id,
-            Name = input.Name.Trim(),
-            Description = input.Description?.Trim(),
-            Enable = input.Enable,
-            ModifiedBy = input.ModifiedBy
-        };
+        var category = BuildCategory(input.Name, input.Description, input.Enable);
+        category.Id = input.Id;
+        category.ModifiedBy = input.ModifiedBy;
 
         return categoryRepository.Update(category);
     }
 
+    private static Category BuildCategory(string name, string? description, bool enable) =>
+        new()
+        {
+            Name = name.Trim(),
+            Description = description?.Trim(),
+            Enable = enable
+        };
+
     public bool DeleteCategory(int id) => categoryRepository.Delete(id);
-
-    private static void ValidateInput(string name, string? description)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Category name is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            throw new ArgumentException("Category description is required.");
-        }
-    }
 
     private static CategoryDto ToDto(Category category) =>
         new(
