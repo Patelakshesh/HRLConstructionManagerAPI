@@ -7,6 +7,8 @@ public interface ISiteService
 {
     IReadOnlyCollection<Site> GetSites();
 
+    SitePage GetSitesPage(int pageNumber, int pageSize, string? search);
+
     Site? GetSite(int id);
 
     Site CreateSite(CreateSiteInput input);

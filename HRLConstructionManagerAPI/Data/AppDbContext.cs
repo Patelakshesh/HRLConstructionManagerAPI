@@ -13,6 +13,12 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<Site> Sites => Set<Site>();
 
+    public DbSet<Category> Categories => Set<Category>();
+
+    public DbSet<Contractor> Contractors => Set<Contractor>();
+
+    public DbSet<SupervisorCredit> SupervisorCredits => Set<SupervisorCredit>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Role>(entity =>
@@ -164,6 +170,118 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 .HasMaxLength(100);
 
             entity.HasIndex(site => site.SiteName);
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Categories");
+
+            entity.HasKey(c => c.Id);
+
+            entity.Property(c => c.Name)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(c => c.Description)
+                .HasMaxLength(500);
+
+            entity.Property(c => c.Enable)
+                .IsRequired();
+
+            entity.Property(c => c.CreatedOn)
+                .IsRequired();
+
+            entity.Property(c => c.CreatedBy)
+                .HasMaxLength(100);
+
+            entity.Property(c => c.ModifiedBy)
+                .HasMaxLength(100);
+
+            entity.HasIndex(c => c.Name);
+        });
+
+        modelBuilder.Entity<Contractor>(entity =>
+        {
+            entity.ToTable("Contractors");
+
+            entity.HasKey(c => c.Id);
+
+            entity.Property(c => c.CompanyName)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(c => c.ContactPerson)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.Property(c => c.Email)
+                .HasMaxLength(256)
+                .IsRequired();
+
+            entity.Property(c => c.Phone)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(c => c.AssignedSites)
+                .HasMaxLength(1000);
+
+            entity.Property(c => c.Enable)
+                .IsRequired();
+
+            entity.Property(c => c.CreatedOn)
+                .IsRequired();
+
+            entity.Property(c => c.CreatedBy)
+                .HasMaxLength(100);
+
+            entity.Property(c => c.ModifiedBy)
+                .HasMaxLength(100);
+
+            entity.HasIndex(c => c.CompanyName);
+            entity.HasIndex(c => c.Email);
+            entity.HasIndex(c => c.Phone);
+        });
+
+        modelBuilder.Entity<SupervisorCredit>(entity =>
+        {
+            entity.ToTable("SupervisorCredits");
+
+            entity.HasKey(c => c.Id);
+
+            entity.Property(c => c.SupervisorName)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(c => c.Amount)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            entity.Property(c => c.PaymentMode)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(c => c.TransactionId)
+                .HasMaxLength(100);
+
+            entity.Property(c => c.Comment)
+                .HasMaxLength(500);
+
+            entity.Property(c => c.Date)
+                .HasColumnType("date")
+                .IsRequired();
+
+            entity.Property(c => c.CreatedOn)
+                .IsRequired();
+
+            entity.Property(c => c.CreatedBy)
+                .HasMaxLength(100);
+
+            entity.Property(c => c.ModifiedBy)
+                .HasMaxLength(100);
+
+            entity.HasIndex(c => c.SupervisorName);
+            entity.HasIndex(c => c.PaymentMode);
+            entity.HasIndex(c => c.Date);
         });
     }
 }

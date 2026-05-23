@@ -199,6 +199,23 @@ Authorization: Bearer {{JwtToken}}
 
 ###
 
+### GraphQL - Get Sites Page (Paginated)
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "query GetSitesPage($pageNumber: Int!, $pageSize: Int!, $search: String) { sitesPage(pageNumber: $pageNumber, pageSize: $pageSize, search: $search) { items { id siteName address city state contactPerson contactNumber startDate endDate enable createdOn createdBy modifiedOn modifiedBy } totalCount pageNumber pageSize totalPages } }",
+  "variables": {
+    "pageNumber": 1,
+    "pageSize": 10,
+    "search": null
+  }
+}
+
+###
+
 ### GraphQL - Get Site By Id
 
 POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
@@ -278,4 +295,278 @@ Authorization: Bearer {{JwtToken}}
 "variables": {
 "id": 1
 }
+}
+
+### =========================================
+
+### PRIVATE GRAPHQL - CATEGORIES
+
+### =========================================
+
+### GraphQL - Get All Categories
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetCategories { categories { id name description enable createdOn createdBy modifiedOn modifiedBy } }"
+}
+
+###
+
+### GraphQL - Get Categories Page
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "query GetCategoriesPage($pageNumber: Int!, $pageSize: Int!, $search: String) { categoriesPage(pageNumber: $pageNumber, pageSize: $pageSize, search: $search) { items { id name description enable createdOn createdBy modifiedOn modifiedBy } totalCount pageNumber pageSize totalPages } }",
+  "variables": {
+    "pageNumber": 1,
+    "pageSize": 10,
+    "search": null
+  }
+}
+
+###
+
+### GraphQL - Create Category
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation CreateCategory($input: CreateCategoryInput!) { createCategory(input: $input) { id name description enable createdOn createdBy } }",
+"variables": {
+"input": {
+"name": "Materials",
+"description": "Construction materials",
+"enable": true,
+"createdBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Update Category
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation UpdateCategory($input: UpdateCategoryInput!) { updateCategory(input: $input) { id name description enable modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"id": 1,
+"name": "Materials updated",
+"description": "Construction materials",
+"enable": true,
+"modifiedBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Delete Category
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation DeleteCategory($id: Int!) { deleteCategory(id: $id) }",
+"variables": {
+"id": 1
+}
+}
+
+### =========================================
+
+### PRIVATE GRAPHQL - CONTRACTORS
+
+### =========================================
+
+### GraphQL - Get All Contractors
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "query GetContractors { contractors { id companyName contactPerson email phone assignedSites enable createdOn createdBy modifiedOn modifiedBy } }"
+}
+
+###
+
+### GraphQL - Get Contractors Page
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "query GetContractorsPage($pageNumber: Int!, $pageSize: Int!, $search: String) { contractorsPage(pageNumber: $pageNumber, pageSize: $pageSize, search: $search) { items { id companyName contactPerson email phone assignedSites enable createdOn createdBy modifiedOn modifiedBy } totalCount pageNumber pageSize totalPages } }",
+  "variables": {
+    "pageNumber": 1,
+    "pageSize": 10,
+    "search": null
+  }
+}
+
+###
+
+### GraphQL - Create Contractor
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation CreateContractor($input: CreateContractorInput!) { createContractor(input: $input) { id companyName contactPerson email phone assignedSites enable createdOn createdBy } }",
+"variables": {
+"input": {
+"companyName": "ABC Corp",
+"contactPerson": "John Doe",
+"email": "john@abc.com",
+"phone": "1234567890",
+"assignedSites": "Site A, Site B",
+"enable": true,
+"createdBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Update Contractor
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation UpdateContractor($input: UpdateContractorInput!) { updateContractor(input: $input) { id companyName contactPerson email phone assignedSites enable modifiedOn modifiedBy } }",
+"variables": {
+"input": {
+"id": 1,
+"companyName": "ABC Corp Updated",
+"contactPerson": "John Doe",
+"email": "john@abc.com",
+"phone": "1234567890",
+"assignedSites": "Site A",
+"enable": true,
+"modifiedBy": "system"
+}
+}
+}
+
+###
+
+### GraphQL - Delete Contractor
+
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+"query": "mutation DeleteContractor($id: Int!) { deleteContractor(id: $id) }",
+"variables": {
+"id": 1
+}
+}
+
+### =========================================
+### PRIVATE GRAPHQL - SUPERVISOR CREDITS
+### =========================================
+
+### GraphQL - Get All Supervisor Credits
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "query GetSupervisorCredits { supervisorCredits { id supervisorName amount paymentMode transactionId comment date createdOn createdBy modifiedOn modifiedBy } }"
+}
+
+###
+
+### GraphQL - Get Supervisor Credits Page
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "query GetSupervisorCreditsPage($pageNumber: Int!, $pageSize: Int!, $search: String, $supervisorName: String, $paymentMode: String) { supervisorCreditsPage(pageNumber: $pageNumber, pageSize: $pageSize, search: $search, supervisorName: $supervisorName, paymentMode: $paymentMode) { items { id supervisorName amount paymentMode transactionId comment date } totalCount pageNumber pageSize totalPages } }",
+  "variables": {
+    "pageNumber": 1,
+    "pageSize": 10,
+    "search": null,
+    "supervisorName": null,
+    "paymentMode": null
+  }
+}
+
+###
+
+### GraphQL - Create Supervisor Credit
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "mutation CreateSupervisorCredit($input: CreateSupervisorCreditInput!) { createSupervisorCredit(input: $input) { id supervisorName amount paymentMode transactionId comment date createdOn createdBy } }",
+  "variables": {
+    "input": {
+      "supervisorName": "John Doe",
+      "amount": 25000,
+      "paymentMode": "Online",
+      "transactionId": "TXN100245",
+      "comment": "Fuel and daily work advance",
+      "date": "2026-04-29T00:00:00Z",
+      "createdBy": "system"
+    }
+  }
+}
+
+###
+
+### GraphQL - Update Supervisor Credit
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "mutation UpdateSupervisorCredit($input: UpdateSupervisorCreditInput!) { updateSupervisorCredit(input: $input) { id supervisorName amount paymentMode transactionId comment date modifiedOn modifiedBy } }",
+  "variables": {
+    "input": {
+      "id": 1,
+      "supervisorName": "John Doe Updated",
+      "amount": 30000,
+      "paymentMode": "Online",
+      "transactionId": "TXN100245",
+      "comment": "Updated advance",
+      "date": "2026-04-29T00:00:00Z",
+      "modifiedBy": "system"
+    }
+  }
+}
+
+###
+
+### GraphQL - Delete Supervisor Credit
+POST {{HRLConstructionManagerAPI_HostAddress}}/graphql
+Content-Type: application/json
+Authorization: Bearer {{JwtToken}}
+
+{
+  "query": "mutation DeleteSupervisorCredit($id: Int!) { deleteSupervisorCredit(id: $id) }",
+  "variables": {
+    "id": 1
+  }
 }

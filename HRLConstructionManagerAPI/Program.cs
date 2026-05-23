@@ -112,9 +112,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IRoleRepository, EfRoleRepository>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddScoped<ISiteRepository, EfSiteRepository>();
+builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
+builder.Services.AddScoped<IContractorRepository, EfContractorRepository>();
+builder.Services.AddScoped<ISupervisorCreditRepository, EfSupervisorCreditRepository>();
+
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISiteService, SiteService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IContractorService, ContractorService>();
+builder.Services.AddScoped<ISupervisorCreditService, SupervisorCreditService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services
@@ -132,7 +140,13 @@ builder.Services
     .AddTypeExtension<UserManagementQuery>()
     .AddTypeExtension<UserManagementMutation>()
     .AddTypeExtension<SiteManagementQuery>()
-    .AddTypeExtension<SiteManagementMutation>();
+    .AddTypeExtension<SiteManagementMutation>()
+    .AddTypeExtension<CategoryManagementQuery>()
+    .AddTypeExtension<CategoryManagementMutation>()
+    .AddTypeExtension<ContractorManagementQuery>()
+    .AddTypeExtension<ContractorManagementMutation>()
+    .AddTypeExtension<SupervisorCreditManagementQuery>()
+    .AddTypeExtension<SupervisorCreditManagementMutation>();
 
 var app = builder.Build();
 

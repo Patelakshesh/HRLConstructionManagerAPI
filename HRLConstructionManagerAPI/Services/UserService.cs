@@ -48,7 +48,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto CreateUser(CreateUserInput input)
     {
-        ValidateCreateInput(input);
         EnsureRoleExists(input.RoleId);
 
         var mobileNumber = input.MobileNumber.Trim();
@@ -76,7 +75,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto? UpdateUser(UpdateUserInput input)
     {
-        ValidateUpdateInput(input);
         EnsureRoleExists(input.RoleId);
         EnsureUserExists(input.Id);
 
@@ -129,87 +127,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
         if (existingUser is not null && existingUser.Id != userId)
         {
             throw new GraphQLException("Mobile number is already in use.");
-        }
-    }
-
-    private static void ValidateCreateInput(CreateUserInput input)
-    {
-        if (string.IsNullOrWhiteSpace(input.Name))
-        {
-            throw new GraphQLException("Name is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.MobileNumber))
-        {
-            throw new GraphQLException("Mobile number is required.");
-        }
-
-        if (!IsValidMobileNumber(input.MobileNumber))
-        {
-            throw new GraphQLException("Mobile number must be a 10-digit number.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Password))
-        {
-            throw new GraphQLException("Password is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Address))
-        {
-            throw new GraphQLException("Address is required.");
-        }
-
-        if (input.RoleId <= 0)
-        {
-            throw new GraphQLException("Role is required.");
-        }
-
-        if (input.Password is not null && string.IsNullOrWhiteSpace(input.Password))
-        {
-            throw new GraphQLException("Password cannot be blank.");
-        }
-
-        if (!string.IsNullOrWhiteSpace(input.Email) && !IsValidEmail(input.Email))
-        {
-            throw new GraphQLException("Email address is invalid.");
-        }
-    }
-
-    private static void ValidateUpdateInput(UpdateUserInput input)
-    {
-        if (input.Id <= 0)
-        {
-            throw new GraphQLException("User id is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Name))
-        {
-            throw new GraphQLException("Name is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.MobileNumber))
-        {
-            throw new GraphQLException("Mobile number is required.");
-        }
-
-        if (!IsValidMobileNumber(input.MobileNumber))
-        {
-            throw new GraphQLException("Mobile number must be a 10-digit number.");
-        }
-
-        if (string.IsNullOrWhiteSpace(input.Address))
-        {
-            throw new GraphQLException("Address is required.");
-        }
-
-        if (input.RoleId <= 0)
-        {
-            throw new GraphQLException("Role is required.");
-        }
-
-        if (!string.IsNullOrWhiteSpace(input.Email) && !IsValidEmail(input.Email))
-        {
-            throw new GraphQLException("Email address is invalid.");
         }
     }
 

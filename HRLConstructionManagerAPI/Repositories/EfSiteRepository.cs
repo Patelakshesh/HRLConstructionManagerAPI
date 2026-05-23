@@ -12,6 +12,33 @@ public sealed class EfSiteRepository(AppDbContext dbContext) : ISiteRepository
             .OrderBy(site => site.Id)
             .ToArray();
 
+    public (IReadOnlyCollection<Site> Items, int TotalCount) GetPaged(
+        int pageNumber,
+        int pageSize,
+        string? search)
+    {
+        var query = dbContext.Sites.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            query = query.Where(site =>
+                site.SiteName.Contains(term) ||
+                site.Address.Contains(term) ||
+                (site.City != null && site.City.Contains(term)) ||
+                (site.ContactPerson != null && site.ContactPerson.Contains(term)));
+        }
+
+        var totalCount = query.Count();
+        var items = query
+            .OrderBy(site => site.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToArray();
+
+        return (items, totalCount);
+    }
+
     public Site? GetById(int id) =>
         dbContext.Sites
             .AsNoTracking()
