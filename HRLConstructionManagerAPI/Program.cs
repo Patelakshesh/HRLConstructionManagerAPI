@@ -85,22 +85,6 @@ builder.Services
         };
     });
 
-//builder.Services
-//    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddJwtBearer(options =>
-//    {
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidateAudience = true,
-//            ValidateLifetime = true,
-//            ValidateIssuerSigningKey = true,
-//            ValidIssuer = jwtSettings.Issuer,
-//            ValidAudience = jwtSettings.Audience,
-//            IssuerSigningKey = jwtSigningKey,
-//            ClockSkew = TimeSpan.Zero
-//        };
-//    });
 
 builder.Services.AddAuthorization();
 

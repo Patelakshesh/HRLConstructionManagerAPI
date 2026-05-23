@@ -48,8 +48,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto CreateUser(CreateUserInput input)
     {
-        EnsureRoleExists(input.RoleId);
-
         var mobileNumber = input.MobileNumber.Trim();
         var name = input.Name.Trim();
         var address = input.Address.Trim();
@@ -75,7 +73,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
 
     public UserDto? UpdateUser(UpdateUserInput input)
     {
-        EnsureRoleExists(input.RoleId);
         EnsureUserExists(input.Id);
 
         var mobileNumber = input.MobileNumber.Trim();
@@ -127,22 +124,6 @@ public sealed class UserService(IUserRepository userRepository, IRoleRepository 
         if (existingUser is not null && existingUser.Id != userId)
         {
             throw new GraphQLException("Mobile number is already in use.");
-        }
-    }
-
-    private static bool IsValidMobileNumber(string mobileNumber) =>
-        Regex.IsMatch(mobileNumber.Trim(), "^\\d{10}$");
-
-    private static bool IsValidEmail(string email)
-    {
-        try
-        {
-            var address = new MailAddress(email);
-            return address.Address.Equals(email, StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
         }
     }
 
