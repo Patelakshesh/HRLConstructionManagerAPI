@@ -4,9 +4,8 @@ public class Contractor
 {
     public int Id { get; set; }
 
-    public required string CompanyName { get; set; }
+    public required string ContractorName { get; set; }
 
-    public required string ContactPerson { get; set; }
 
     public required string Email { get; set; }
 

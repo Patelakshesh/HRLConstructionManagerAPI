@@ -2,8 +2,7 @@ namespace HRLConstructionManagerAPI.Models;
 
 public sealed record ContractorDto(
     int Id,
-    string CompanyName,
-    string ContactPerson,
+    string ContractorName,
     string Email,
     string Phone,
     string? AssignedSites,

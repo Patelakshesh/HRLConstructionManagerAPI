@@ -40,7 +40,7 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
 
     public Contractor CreateContractor(CreateContractorInput input)
     {
-        var contractor = BuildContractor(input.CompanyName, input.ContactPerson, input.Email, input.Phone, input.AssignedSites, input.Enable);
+        var contractor = BuildContractor(input.ContractorName, input.Email, input.Phone, input.AssignedSites, input.Enable);
         contractor.CreatedBy = input.CreatedBy;
 
         return contractorRepository.Add(contractor);
@@ -48,7 +48,7 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
 
     public Contractor? UpdateContractor(UpdateContractorInput input)
     {
-        var contractor = BuildContractor(input.CompanyName, input.ContactPerson, input.Email, input.Phone, input.AssignedSites, input.Enable);
+        var contractor = BuildContractor(input.ContractorName, input.Email, input.Phone, input.AssignedSites, input.Enable);
         contractor.Id = input.Id;
         contractor.ModifiedBy = input.ModifiedBy;
 
@@ -56,12 +56,11 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
     }
 
     private static Contractor BuildContractor(
-        string companyName, string contactPerson, string email,
+        string contractorName, string email,
         string phone, string? assignedSites, bool enable) =>
         new()
         {
-            CompanyName = companyName.Trim(),
-            ContactPerson = contactPerson.Trim(),
+            ContractorName = contractorName.Trim(),
             Email = email.Trim(),
             Phone = phone.Trim(),
             AssignedSites = assignedSites?.Trim(),
@@ -74,8 +73,7 @@ public sealed partial class ContractorService(IContractorRepository contractorRe
     private static ContractorDto ToDto(Contractor contractor) =>
         new(
             contractor.Id,
-            contractor.CompanyName,
-            contractor.ContactPerson,
+            contractor.ContractorName,
             contractor.Email,
             contractor.Phone,
             contractor.AssignedSites,

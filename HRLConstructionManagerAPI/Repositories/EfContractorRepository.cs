@@ -23,8 +23,7 @@ public sealed class EfContractorRepository(AppDbContext dbContext) : IContractor
         {
             var term = search.Trim();
             query = query.Where(c =>
-                c.CompanyName.Contains(term) ||
-                c.ContactPerson.Contains(term) ||
+                c.ContractorName.Contains(term) ||
                 c.Email.Contains(term) ||
                 c.Phone.Contains(term));
         }
@@ -56,8 +55,7 @@ public sealed class EfContractorRepository(AppDbContext dbContext) : IContractor
         var existing = dbContext.Contractors.FirstOrDefault(c => c.Id == contractor.Id);
         if (existing is null) return null;
 
-        existing.CompanyName = contractor.CompanyName;
-        existing.ContactPerson = contractor.ContactPerson;
+        existing.ContractorName = contractor.ContractorName;
         existing.Email = contractor.Email;
         existing.Phone = contractor.Phone;
         existing.AssignedSites = contractor.AssignedSites;

@@ -206,12 +206,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
             entity.HasKey(c => c.Id);
 
-            entity.Property(c => c.CompanyName)
+            entity.Property(c => c.ContractorName)
                 .HasMaxLength(150)
-                .IsRequired();
-
-            entity.Property(c => c.ContactPerson)
-                .HasMaxLength(100)
                 .IsRequired();
 
             entity.Property(c => c.Email)
@@ -237,7 +233,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(c => c.ModifiedBy)
                 .HasMaxLength(100);
 
-            entity.HasIndex(c => c.CompanyName);
+            entity.HasIndex(c => c.ContractorName);
             entity.HasIndex(c => c.Email);
             entity.HasIndex(c => c.Phone);
         });
