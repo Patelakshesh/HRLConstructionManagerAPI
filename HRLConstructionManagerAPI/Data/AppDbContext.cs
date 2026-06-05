@@ -19,6 +19,10 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
     public DbSet<SupervisorCredit> SupervisorCredits => Set<SupervisorCredit>();
 
+    public DbSet<Expense> Expenses => Set<Expense>();
+
+    public DbSet<Attendance> Attendances => Set<Attendance>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Role>(entity =>
@@ -278,6 +282,71 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasIndex(c => c.SupervisorName);
             entity.HasIndex(c => c.PaymentMode);
             entity.HasIndex(c => c.Date);
+        });
+
+        modelBuilder.Entity<Expense>(entity =>
+        {
+            entity.ToTable("Expenses");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Title).HasMaxLength(250).IsRequired();
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.PaymentMode).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.TransactionId).HasMaxLength(100);
+            entity.Property(e => e.Type).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Date).HasColumnType("date").IsRequired();
+            entity.Property(e => e.CreatedOn).IsRequired();
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+
+            entity.HasOne(e => e.Site)
+                .WithMany()
+                .HasForeignKey(e => e.SiteId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.Category)
+                .WithMany()
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.Date);
+            entity.HasIndex(e => e.Type);
+        });
+
+        modelBuilder.Entity<Attendance>(entity =>
+        {
+            entity.ToTable("Attendances");
+
+            entity.HasKey(a => a.Id);
+
+            entity.Property(a => a.Date).HasColumnType("date").IsRequired();
+            entity.Property(a => a.SkilledWorkers).IsRequired();
+            entity.Property(a => a.SemiSkilledWorkers).IsRequired();
+            entity.Property(a => a.UnskilledWorkers).IsRequired();
+            entity.Property(a => a.StartTime).IsRequired();
+            entity.Property(a => a.EndTime).IsRequired();
+            
+            entity.Property(a => a.CreatedOn).IsRequired();
+            entity.Property(a => a.CreatedBy).HasMaxLength(100);
+            entity.Property(a => a.ModifiedBy).HasMaxLength(100);
+
+            entity.HasOne(a => a.Site)
+                .WithMany()
+                .HasForeignKey(a => a.SiteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.Contractor)
+                .WithMany()
+                .HasForeignKey(a => a.ContractorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.Supervisor)
+                .WithMany()
+                .HasForeignKey(a => a.SupervisorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(a => a.Date);
         });
     }
 }

@@ -94,6 +94,8 @@ builder.Services.AddScoped<ISiteRepository, EfSiteRepository>();
 builder.Services.AddScoped<ICategoryRepository, EfCategoryRepository>();
 builder.Services.AddScoped<IContractorRepository, EfContractorRepository>();
 builder.Services.AddScoped<ISupervisorCreditRepository, EfSupervisorCreditRepository>();
+builder.Services.AddScoped<IExpenseRepository, EfExpenseRepository>();
+builder.Services.AddScoped<IAttendanceRepository, EfAttendanceRepository>();
 
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -125,7 +127,12 @@ builder.Services
     .AddTypeExtension<ContractorManagementQuery>()
     .AddTypeExtension<ContractorManagementMutation>()
     .AddTypeExtension<SupervisorCreditManagementQuery>()
-    .AddTypeExtension<SupervisorCreditManagementMutation>();
+    .AddTypeExtension<SupervisorCreditManagementMutation>()
+    .AddTypeExtension<ExpenseManagementQuery>()
+    .AddTypeExtension<ExpenseManagementMutation>()
+    .AddTypeExtension<AttendanceManagementQuery>()
+    .AddTypeExtension<AttendanceManagementMutation>()
+    .AddTypeExtension<DashboardManagementQuery>();
 
 var app = builder.Build();
 
