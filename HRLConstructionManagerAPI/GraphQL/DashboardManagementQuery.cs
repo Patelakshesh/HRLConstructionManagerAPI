@@ -20,39 +20,116 @@ public sealed record SiteBudgetComparison(string Site, decimal Budget, decimal A
 public sealed class DashboardManagementQuery
 {
     [Authorize]
-    public async Task<DashboardStats> GetDashboardStats([Service] AppDbContext context)
+    public async Task<DashboardStats> GetDashboardStats([Service] AppDbContext context, string? dateFilter, string? siteName)
     {
-        var activeSites = await context.Sites.Where(s => s.Enable).CountAsync();
+        var sitesQuery = context.Sites.Where(s => s.Enable);
+        int? targetSiteId = null;
         
-        // In a real app, Budget might be a property of Site or a separate entity. 
-        // For now, we will mock a fixed budget per active site (e.g. 500,000) or calculate it.
-        var totalBudget = activeSites * 500000m; 
-        
-        var totalExpenses = await context.Expenses
-            .Where(e => e.Type == "Expense")
-            .SumAsync(e => e.Amount);
-            
+        if (!string.IsNullOrEmpty(siteName) && !siteName.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            var siteObj = await context.Sites.FirstOrDefaultAsync(s => s.SiteName == siteName);
+            if (siteObj != null)
+            {
+                targetSiteId = siteObj.Id;
+                sitesQuery = sitesQuery.Where(s => s.Id == targetSiteId.Value);
+            }
+        }
+
+        var activeSitesCount = await sitesQuery.CountAsync();
+        var totalBudget = activeSitesCount * 500000m;
+
+        var expenseQuery = context.Expenses.Where(e => e.Type == "Expense");
+        if (targetSiteId.HasValue)
+        {
+            expenseQuery = expenseQuery.Where(e => e.SiteId == targetSiteId.Value);
+        }
+
+        if (!string.IsNullOrEmpty(dateFilter))
+        {
+            var now = DateTime.UtcNow;
+            switch (dateFilter.ToLower())
+            {
+                case "today":
+                    var todayStart = DateTime.Today.ToUniversalTime();
+                    expenseQuery = expenseQuery.Where(e => e.Date >= todayStart);
+                    break;
+                case "last7days":
+                    var sevenDaysAgo = DateTime.UtcNow.Date.AddDays(-7);
+                    expenseQuery = expenseQuery.Where(e => e.Date >= sevenDaysAgo);
+                    break;
+                case "last30days":
+                    var thirtyDaysAgo = DateTime.UtcNow.Date.AddDays(-30);
+                    expenseQuery = expenseQuery.Where(e => e.Date >= thirtyDaysAgo);
+                    break;
+                case "thismonth":
+                    var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                    expenseQuery = expenseQuery.Where(e => e.Date >= startOfMonth);
+                    break;
+            }
+        }
+
+        var totalExpenses = await expenseQuery.SumAsync(e => e.Amount);
         var remainingBudget = totalBudget - totalExpenses;
 
-        // Mock trends and comparisons since budget isn't fully tracked per month in the db yet
-        // In a complete system, we'd group expenses by month.
-        var expenseTrends = new List<ExpenseTrend>
+        // Dynamic trends for past 6 months
+        var months = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        var expenseTrends = new List<ExpenseTrend>();
+        
+        var trendQuery = context.Expenses.Where(e => e.Type == "Expense");
+        if (targetSiteId.HasValue)
         {
-            new("Jan", 45000, 50000),
-            new("Feb", 52000, 55000),
-            new("Mar", 48000, 50000),
-            new("Apr", 61000, 60000),
-            new("May", 55000, 65000),
-            new("Jun", 67000, 70000)
-        };
+            trendQuery = trendQuery.Where(e => e.SiteId == targetSiteId.Value);
+        }
 
-        var sites = await context.Sites.Where(s => s.Enable).ToListAsync();
-        var budgetComparisons = new List<SiteBudgetComparison>();
-        foreach (var site in sites)
+        var sixMonthsAgo = DateTime.UtcNow.Date.AddMonths(-5);
+        var recentExpensesList = await trendQuery
+            .Where(e => e.Date >= new DateTime(sixMonthsAgo.Year, sixMonthsAgo.Month, 1, 0, 0, 0, DateTimeKind.Utc))
+            .ToListAsync();
+
+        for (int i = 5; i >= 0; i--)
         {
-            var siteExpense = await context.Expenses
-                .Where(e => e.SiteId == site.Id && e.Type == "Expense")
-                .SumAsync(e => e.Amount);
+            var targetMonth = DateTime.UtcNow.AddMonths(-i);
+            var monthName = months[targetMonth.Month - 1];
+            var monthExpenses = recentExpensesList
+                .Where(e => e.Date.Month == targetMonth.Month && e.Date.Year == targetMonth.Year)
+                .Sum(e => e.Amount);
+            
+            var activeSiteCount = targetSiteId.HasValue ? 1 : activeSitesCount;
+            var monthBudget = activeSiteCount * 50000m;
+            
+            expenseTrends.Add(new ExpenseTrend(monthName, monthExpenses, monthBudget));
+        }
+
+        // Budget comparisons list
+        var sitesList = await sitesQuery.ToListAsync();
+        var budgetComparisons = new List<SiteBudgetComparison>();
+        foreach (var site in sitesList)
+        {
+            var siteExpenseQuery = context.Expenses.Where(e => e.SiteId == site.Id && e.Type == "Expense");
+            if (!string.IsNullOrEmpty(dateFilter))
+            {
+                var now = DateTime.UtcNow;
+                switch (dateFilter.ToLower())
+                {
+                    case "today":
+                        var todayStart = DateTime.Today.ToUniversalTime();
+                        siteExpenseQuery = siteExpenseQuery.Where(e => e.Date >= todayStart);
+                        break;
+                    case "last7days":
+                        var sevenDaysAgo = DateTime.UtcNow.Date.AddDays(-7);
+                        siteExpenseQuery = siteExpenseQuery.Where(e => e.Date >= sevenDaysAgo);
+                        break;
+                    case "last30days":
+                        var thirtyDaysAgo = DateTime.UtcNow.Date.AddDays(-30);
+                        siteExpenseQuery = siteExpenseQuery.Where(e => e.Date >= thirtyDaysAgo);
+                        break;
+                    case "thismonth":
+                        var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                        siteExpenseQuery = siteExpenseQuery.Where(e => e.Date >= startOfMonth);
+                        break;
+                }
+            }
+            var siteExpense = await siteExpenseQuery.SumAsync(e => e.Amount);
             budgetComparisons.Add(new SiteBudgetComparison(site.SiteName, 500000m, siteExpense));
         }
 
@@ -60,7 +137,7 @@ public sealed class DashboardManagementQuery
             TotalBudget: totalBudget,
             TotalExpenses: totalExpenses,
             RemainingBudget: remainingBudget,
-            ActiveSites: activeSites,
+            ActiveSites: activeSitesCount,
             ExpenseTrends: expenseTrends,
             BudgetComparisons: budgetComparisons);
     }
