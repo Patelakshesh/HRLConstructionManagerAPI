@@ -86,7 +86,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()));
+        sqlOptions => sqlOptions.CommandTimeout(120).EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IRoleRepository, EfRoleRepository>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
@@ -108,11 +108,13 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services
     .AddGraphQLServer("public")
+    .ModifyRequestOptions(opt => opt.ExecutionTimeout = System.TimeSpan.FromSeconds(120))
     .AddQueryType<PublicQuery>()
     .AddMutationType<AuthMutation>();
 
 builder.Services
     .AddGraphQLServer("private")
+    .ModifyRequestOptions(opt => opt.ExecutionTimeout = System.TimeSpan.FromSeconds(120))
     .AddAuthorization()
 
     .AddQueryType(d => d.Name("Query"))

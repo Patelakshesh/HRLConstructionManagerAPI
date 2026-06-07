@@ -22,6 +22,8 @@ public class Expense
 
     public required string Type { get; set; } // Income or Expense
 
+    public string? ReceiptImage { get; set; }
+
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
     public string? CreatedBy { get; set; }

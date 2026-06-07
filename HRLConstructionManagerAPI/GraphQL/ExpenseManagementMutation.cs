@@ -23,7 +23,8 @@ public sealed class ExpenseManagementMutation
             TransactionId = input.TransactionId?.Trim(),
             Date = input.Date,
             Type = input.Type.Trim(),
-            CreatedBy = input.CreatedBy
+            CreatedBy = input.CreatedBy,
+            ReceiptImage = input.ReceiptImage
         };
 
         return await expenseRepository.CreateExpenseAsync(expense);
@@ -50,6 +51,7 @@ public sealed class ExpenseManagementMutation
         expense.Type = input.Type.Trim();
         expense.ModifiedBy = input.ModifiedBy;
         expense.ModifiedOn = DateTime.UtcNow;
+        expense.ReceiptImage = input.ReceiptImage;
 
         return await expenseRepository.UpdateExpenseAsync(expense);
     }

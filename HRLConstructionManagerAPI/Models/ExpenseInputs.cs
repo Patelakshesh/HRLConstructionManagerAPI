@@ -9,7 +9,8 @@ public record CreateExpenseInput(
     string? TransactionId,
     DateTime Date,
     string Type,
-    string? CreatedBy);
+    string? CreatedBy,
+    string? ReceiptImage);
 
 public record UpdateExpenseInput(
     int Id,
@@ -21,4 +22,5 @@ public record UpdateExpenseInput(
     string? TransactionId,
     DateTime Date,
     string Type,
-    string? ModifiedBy);
+    string? ModifiedBy,
+    string? ReceiptImage);

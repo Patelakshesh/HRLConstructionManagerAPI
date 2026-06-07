@@ -299,6 +299,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(e => e.CreatedOn).IsRequired();
             entity.Property(e => e.CreatedBy).HasMaxLength(100);
             entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+            entity.Property(e => e.ReceiptImage);
 
             entity.HasOne(e => e.Site)
                 .WithMany()
