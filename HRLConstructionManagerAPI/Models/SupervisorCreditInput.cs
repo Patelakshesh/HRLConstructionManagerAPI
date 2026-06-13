@@ -9,6 +9,7 @@ public sealed record CreateSupervisorCreditInput(
     [MaxLength(100)] string? TransactionId,
     [MaxLength(500)] string? Comment,
     [Required] DateTime Date,
+    string? ReceiptImage,
     string? CreatedBy);
 
 public sealed record UpdateSupervisorCreditInput(
@@ -19,4 +20,5 @@ public sealed record UpdateSupervisorCreditInput(
     [MaxLength(100)] string? TransactionId,
     [MaxLength(500)] string? Comment,
     [Required] DateTime Date,
+    string? ReceiptImage,
     string? ModifiedBy);

@@ -7,6 +7,8 @@ using HRLConstructionManagerAPI.Repositories;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
+using HotChocolate;
+
 namespace HRLConstructionManagerAPI.Services;
 
 public sealed class AuthService(IUserRepository userRepository, IOptions<JwtSettings> jwtOptions) : IAuthService
@@ -18,12 +20,12 @@ public sealed class AuthService(IUserRepository userRepository, IOptions<JwtSett
         var user = userRepository.GetByMobileNumber(input.MobileNumber);
         if (user is null || user.Password != input.Password)
         {
-            throw new UnauthorizedAccessException("Invalid mobile number or password.");
+            throw new GraphQLException("Invalid mobile number or password.");
         }
 
         if (!user.Enable)
         {
-            throw new UnauthorizedAccessException("User is inactive.");
+            throw new GraphQLException("User is inactive.");
         }
 
         var expiresOn = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);

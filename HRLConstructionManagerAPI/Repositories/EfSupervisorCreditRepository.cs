@@ -77,6 +77,7 @@ public sealed class EfSupervisorCreditRepository(AppDbContext dbContext) : ISupe
         existing.TransactionId = credit.TransactionId;
         existing.Comment = credit.Comment;
         existing.Date = credit.Date;
+        existing.ReceiptImage = credit.ReceiptImage;
         existing.ModifiedOn = DateTime.UtcNow;
         existing.ModifiedBy = credit.ModifiedBy;
 

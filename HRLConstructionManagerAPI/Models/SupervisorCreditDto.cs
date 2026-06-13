@@ -8,6 +8,7 @@ public sealed record SupervisorCreditDto(
     string? TransactionId,
     string? Comment,
     DateTime Date,
+    string? ReceiptImage,
     DateTime CreatedOn,
     string? CreatedBy,
     DateTime? ModifiedOn,

@@ -16,6 +16,8 @@ public class SupervisorCredit
 
     public DateTime Date { get; set; }
 
+    public string? ReceiptImage { get; set; }
+
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
     public string? CreatedBy { get; set; }

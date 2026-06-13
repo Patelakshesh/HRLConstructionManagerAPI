@@ -279,6 +279,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(c => c.ModifiedBy)
                 .HasMaxLength(100);
 
+            entity.Property(c => c.ReceiptImage);
+
             entity.HasIndex(c => c.SupervisorName);
             entity.HasIndex(c => c.PaymentMode);
             entity.HasIndex(c => c.Date);

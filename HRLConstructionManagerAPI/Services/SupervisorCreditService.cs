@@ -53,7 +53,7 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
         var paymentMode = input.PaymentMode.Trim();
         ValidatePaymentMode(paymentMode, input.TransactionId);
 
-        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date);
+        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date, input.ReceiptImage);
         credit.CreatedBy = input.CreatedBy;
 
         return creditRepository.Add(credit);
@@ -64,7 +64,7 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
         var paymentMode = input.PaymentMode.Trim();
         ValidatePaymentMode(paymentMode, input.TransactionId);
 
-        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date);
+        var credit = BuildCredit(input.SupervisorName, input.Amount, paymentMode, input.TransactionId, input.Comment, input.Date, input.ReceiptImage);
         credit.Id = input.Id;
         credit.ModifiedBy = input.ModifiedBy;
 
@@ -73,7 +73,7 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
 
     private static SupervisorCredit BuildCredit(
         string supervisorName, decimal amount, string paymentMode,
-        string? transactionId, string? comment, DateTime date) =>
+        string? transactionId, string? comment, DateTime date, string? receiptImage) =>
         new()
         {
             SupervisorName = supervisorName.Trim(),
@@ -81,7 +81,8 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
             PaymentMode = paymentMode,
             TransactionId = string.IsNullOrWhiteSpace(transactionId) ? null : transactionId.Trim(),
             Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
-            Date = date
+            Date = date,
+            ReceiptImage = receiptImage
         };
 
     public bool DeleteSupervisorCredit(int id) => creditRepository.Delete(id);
@@ -109,6 +110,7 @@ public sealed class SupervisorCreditService(ISupervisorCreditRepository creditRe
             credit.TransactionId,
             credit.Comment,
             credit.Date,
+            credit.ReceiptImage,
             credit.CreatedOn,
             credit.CreatedBy,
             credit.ModifiedOn,

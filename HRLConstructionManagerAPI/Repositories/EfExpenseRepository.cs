@@ -23,11 +23,47 @@ public class EfExpenseRepository(AppDbContext context) : IExpenseRepository
 
     public async Task<IEnumerable<Expense>> GetAllExpensesAsync()
     {
-        return await context.Expenses
-            .Include(e => e.Site)
-            .Include(e => e.Category)
+        var temp = await context.Expenses
+            .Select(e => new
+            {
+                e.Id,
+                e.Title,
+                e.SiteId,
+                e.Site,
+                e.CategoryId,
+                e.Category,
+                e.Amount,
+                e.PaymentMode,
+                e.TransactionId,
+                e.Date,
+                e.Type,
+                e.CreatedOn,
+                e.CreatedBy,
+                e.ModifiedOn,
+                e.ModifiedBy
+            })
             .OrderByDescending(e => e.Date)
             .ToListAsync();
+
+        return temp.Select(e => new Expense
+        {
+            Id = e.Id,
+            Title = e.Title,
+            SiteId = e.SiteId,
+            Site = e.Site,
+            CategoryId = e.CategoryId,
+            Category = e.Category,
+            Amount = e.Amount,
+            PaymentMode = e.PaymentMode,
+            TransactionId = e.TransactionId,
+            Date = e.Date,
+            Type = e.Type,
+            ReceiptImage = null,
+            CreatedOn = e.CreatedOn,
+            CreatedBy = e.CreatedBy,
+            ModifiedOn = e.ModifiedOn,
+            ModifiedBy = e.ModifiedBy
+        });
     }
 
     public async Task<(IEnumerable<Expense> Items, int TotalCount)> GetExpensesPageAsync(int pageNumber, int pageSize, string? search, int? siteId)
