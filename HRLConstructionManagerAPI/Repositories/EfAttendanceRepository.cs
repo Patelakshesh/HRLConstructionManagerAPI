@@ -22,14 +22,25 @@ public class EfAttendanceRepository(AppDbContext context) : IAttendanceRepositor
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<IEnumerable<Attendance>> GetAllAttendancesAsync()
+    public async Task<IEnumerable<Attendance>> GetAllAttendancesAsync(DateTime? startDate, DateTime? endDate)
     {
-        return await context.Attendances
+        var query = context.Attendances
             .Include(a => a.Site)
             .Include(a => a.Contractor)
             .Include(a => a.Supervisor)
-            .OrderByDescending(a => a.Date)
-            .ToListAsync();
+            .AsQueryable();
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(a => a.Date >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(a => a.Date <= endDate.Value);
+        }
+
+        return await query.OrderByDescending(a => a.Date).ToListAsync();
     }
 
     public async Task<(IEnumerable<Attendance> Items, int TotalCount)> GetAttendancesPageAsync(

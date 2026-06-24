@@ -24,6 +24,8 @@ public class Attendance
     public TimeSpan StartTime { get; set; }
 
     public TimeSpan EndTime { get; set; }
+    
+    public string? Image { get; set; }
 
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

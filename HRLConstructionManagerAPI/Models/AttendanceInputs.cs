@@ -10,6 +10,7 @@ public record CreateAttendanceInput(
     int UnskilledWorkers,
     TimeSpan StartTime,
     TimeSpan EndTime,
+    string? Image,
     string? CreatedBy);
 
 public record UpdateAttendanceInput(
@@ -23,4 +24,5 @@ public record UpdateAttendanceInput(
     int UnskilledWorkers,
     TimeSpan StartTime,
     TimeSpan EndTime,
+    string? Image,
     string? ModifiedBy);

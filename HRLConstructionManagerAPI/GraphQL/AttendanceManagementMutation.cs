@@ -24,6 +24,7 @@ public sealed class AttendanceManagementMutation
             UnskilledWorkers = input.UnskilledWorkers,
             StartTime = input.StartTime,
             EndTime = input.EndTime,
+            Image = input.Image,
             CreatedBy = input.CreatedBy
         };
 
@@ -50,6 +51,7 @@ public sealed class AttendanceManagementMutation
         attendance.UnskilledWorkers = input.UnskilledWorkers;
         attendance.StartTime = input.StartTime;
         attendance.EndTime = input.EndTime;
+        attendance.Image = input.Image;
         attendance.ModifiedBy = input.ModifiedBy;
         attendance.ModifiedOn = DateTime.UtcNow;
 

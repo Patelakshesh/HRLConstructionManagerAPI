@@ -9,8 +9,11 @@ using HotChocolate.Authorization;
 public sealed class AttendanceManagementQuery
 {
     [Authorize]
-    public async Task<IReadOnlyCollection<Attendance>> GetAttendances([Service] IAttendanceRepository attendanceRepository) =>
-        (await attendanceRepository.GetAllAttendancesAsync()).ToList().AsReadOnly();
+    public async Task<IReadOnlyCollection<Attendance>> GetAttendances(
+        DateTime? startDate,
+        DateTime? endDate,
+        [Service] IAttendanceRepository attendanceRepository) =>
+        (await attendanceRepository.GetAllAttendancesAsync(startDate, endDate)).ToList().AsReadOnly();
 
     [Authorize]
     public async Task<AttendancePage> GetAttendancesPage(

@@ -21,9 +21,21 @@ public class EfExpenseRepository(AppDbContext context) : IExpenseRepository
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task<IEnumerable<Expense>> GetAllExpensesAsync()
+    public async Task<IEnumerable<Expense>> GetAllExpensesAsync(DateTime? startDate, DateTime? endDate)
     {
-        var temp = await context.Expenses
+        var query = context.Expenses.AsQueryable();
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(e => e.Date >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(e => e.Date <= endDate.Value);
+        }
+
+        var temp = await query
             .Select(e => new
             {
                 e.Id,

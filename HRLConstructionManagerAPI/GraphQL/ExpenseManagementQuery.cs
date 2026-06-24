@@ -9,8 +9,11 @@ using HotChocolate.Authorization;
 public sealed class ExpenseManagementQuery
 {
     [Authorize]
-    public async Task<IReadOnlyCollection<Expense>> GetExpenses([Service] IExpenseRepository expenseRepository) =>
-        (await expenseRepository.GetAllExpensesAsync()).ToList().AsReadOnly();
+    public async Task<IReadOnlyCollection<Expense>> GetExpenses(
+        DateTime? startDate,
+        DateTime? endDate,
+        [Service] IExpenseRepository expenseRepository) =>
+        (await expenseRepository.GetAllExpensesAsync(startDate, endDate)).ToList().AsReadOnly();
 
     [Authorize]
     public async Task<ExpensePage> GetExpensesPage(
