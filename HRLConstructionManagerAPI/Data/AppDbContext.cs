@@ -44,21 +44,21 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.HasIndex(role => role.RoleName)
                 .IsUnique();
 
-            entity.HasData(
-                new Role
-                {
-                    Id = 1,
-                    RoleName = "admin",
-                    Enable = true,
-                    CreatedOn = SeedCreatedOn
-                },
-                new Role
-                {
-                    Id = 2,
-                    RoleName = "supervision",
-                    Enable = true,
-                    CreatedOn = SeedCreatedOn
-                });
+            //entity.HasData(
+            //    new Role
+            //    {
+            //        Id = 1,
+            //        RoleName = "admin",
+            //        Enable = true,
+            //        CreatedOn = SeedCreatedOn
+            //    },
+            //    new Role
+            //    {
+            //        Id = 2,
+            //        RoleName = "supervision",
+            //        Enable = true,
+            //        CreatedOn = SeedCreatedOn
+            //    });
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -106,33 +106,33 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
                 .HasForeignKey(user => user.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasData(
-                new User
-                {
-                    Id = 1,
-                    MobileNumber = "9999999999",
-                    Name = "Admin User",
-                    Password = "admin",
-                    RoleId = 1,
-                    Address = "Head Office",
-                    Email = "admin@example.com",
-                    Enable = true,
-                    CreatedOn = SeedCreatedOn,
-                    CreatedBy = "system"
-                },
-                new User
-                {
-                    Id = 2,
-                    MobileNumber = "8888888888",
-                    Name = "Supervision User",
-                    Password = "supervision",
-                    RoleId = 2,
-                    Address = "Site Office",
-                    Email = "supervision@example.com",
-                    Enable = true,
-                    CreatedOn = SeedCreatedOn,
-                    CreatedBy = "system"
-                });
+            //entity.HasData(
+            //    new User
+            //    {
+            //        Id = 1,
+            //        MobileNumber = "9999999999",
+            //        Name = "Admin User",
+            //        Password = "admin",
+            //        RoleId = 1,
+            //        Address = "Head Office",
+            //        Email = "admin@example.com",
+            //        Enable = true,
+            //        CreatedOn = SeedCreatedOn,
+            //        CreatedBy = "system"
+            //    },
+            //    new User
+            //    {
+            //        Id = 2,
+            //        MobileNumber = "8888888888",
+            //        Name = "Supervision User",
+            //        Password = "supervision",
+            //        RoleId = 2,
+            //        Address = "Site Office",
+            //        Email = "supervision@example.com",
+            //        Enable = true,
+            //        CreatedOn = SeedCreatedOn,
+            //        CreatedBy = "system"
+            //    });
         });
 
         modelBuilder.Entity<Site>(entity =>
@@ -315,6 +315,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 
             entity.HasIndex(e => e.Date);
             entity.HasIndex(e => e.Type);
+            entity.ToTable("Expenses", tb =>
+            {
+                tb.HasTrigger("TR_Expenses_Audit");
+            });
+
         });
 
         modelBuilder.Entity<Attendance>(entity =>
